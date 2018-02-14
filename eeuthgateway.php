@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /*
 Plugin Name: Research Committee of UTH - WooCommerce Gateway
-Plugin URI: https://github.com/mafoti/ResearchCommitteeUthWooCommerceGateway
+Plugin URI: https://github.com/mafoti/ResearchCommitteeUthWooCommerceGateway-
 Description: Extends WooCommerce by Adding custom gateway
 Version: 1.0
 Author: Magda Foti
