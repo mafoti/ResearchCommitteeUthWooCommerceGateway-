@@ -39,7 +39,7 @@ class WC_Gateway_EEUth extends WC_Payment_Gateway {
 		$this->EEUthUrl = "http://ee.uth.gr/conference/registration.php";
 
         // Customer Emails
-        add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
+        //add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
 		
 		//Actions
 		add_action('woocommerce_receipt_' . $this->id, array( $this, 'receipt_page' ));
@@ -122,7 +122,7 @@ class WC_Gateway_EEUth extends WC_Payment_Gateway {
 			'a'           => wc_format_decimal($order->get_total(), 2, false),
 			'n'           => $order->get_formatted_billing_full_name(),
 			'r'           => $uniqid . 'EEUth' .  ( ( WC()->version >= '3.0.0' ) ? $order->get_id() : $order->id ),
-			'payerEmail'  => ( WC()->version >= '3.0.0' ) ? $order->get_billing_email() : $order->billing_email
+			'email'       => ( WC()->version >= '3.0.0' ) ? $order->get_billing_email() : $order->billing_email
 		);
 		
 		$args = array_merge($args, array(
@@ -137,7 +137,7 @@ class WC_Gateway_EEUth extends WC_Payment_Gateway {
 	* Output for the order received page.
 	* */
 	public function receipt_page($order_id) {
-		echo '<p>' . __('Thank you - your order is now pending payment. Please click the button below to proceed.', 'woocommerce') . '</p>';
+		echo '<p>' . __('Σας ευχαριστούμε - για την ολοκλήρωση της εγγραφής σας εκκρεμεί πλέον η πληρωμή. Κάντε κλικ στο παρακάτω κουμπί για να συνεχίσετε.', 'woocommerce') . '</p>';
 		$order = wc_get_order( $order_id );
 		$uniqid = uniqid();
 						
@@ -155,7 +155,7 @@ class WC_Gateway_EEUth extends WC_Payment_Gateway {
 				echo $field;
 			?>
 			
-			<input type="submit" class="button alt" id="submit_twocheckout_payment_form" value="<?php echo __( 'Συνέχεια στο σύστημα πληρωμών του Πανεπιστημίου Θεσσαλίας', 'woocommerce' ) ?>" /> 
+			<input type="submit" class="button alt" id="submit_twocheckout_payment_form" value="<?php echo __( 'Πληρωμή', 'woocommerce' ) ?>" /> 
 			<a class="button cancel" href="<?php echo esc_url( $order->get_cancel_order_url() )?>"><?php echo __( 'Ακύρωση Πληρωμής', 'woocommerce' )?></a>
 			
 		</form>		
@@ -163,6 +163,7 @@ class WC_Gateway_EEUth extends WC_Payment_Gateway {
 		
 		
 		$order->update_status( 'pending', __( 'Sent request to Research Committee with orderID: ' . $form_data['orderid'] , 'woocommerce' ) );
+      	WC()->cart->empty_cart();
 	}
     
     /**
@@ -185,7 +186,28 @@ class WC_Gateway_EEUth extends WC_Payment_Gateway {
 	* */
 	public function check_response() { 
 		
-		
+		/*if(isset($_REQUEST['cancel'])){
+			$order = wc_get_order(wc_clean($_REQUEST['cancel']));
+			if (isset($order)){
+				$order->add_order_note('Alpha Bank Payment <strong>' . $required_response['status'] . '</strong>. txId: ' . $required_response['txId'] . '. ' . $required_response['message'] );
+				wp_redirect( $order->get_cancel_order_url_raw());
+				exit();
+			}
+		}
+		else if (isset($_REQUEST['confirm'])){
+			$order = wc_get_order(wc_clean($_REQUEST['confirm']));
+			if (isset($order)){
+				if ($required_response['orderAmount'] == wc_format_decimal($order->get_total(), 2, false)){
+					$order->add_order_note('Alpha Bank Payment <strong>' . $required_response['status'] . '</strong>. txId: ' . $required_response['txId'] . '. payMethod: ' . $required_response['payMethod']. '. paymentRef: ' . $required_response['paymentRef'] . '. ' . $required_response['message'] );
+					$order->payment_complete('Alpha Bank Payment ' . $required_response['status'] . '. txId: ' . $required_response['txId'] );
+					wp_redirect($this->get_return_url( $order ));
+					exit();
+				}
+				else{
+					$order->add_order_note('Payment received with incorrect amount. Alpha Bank Payment <strong>' . $required_response['status'] . '</strong>. '. $required_response['message'] );
+				}
+			}
+		}*/
 		exit();
 	}
 
